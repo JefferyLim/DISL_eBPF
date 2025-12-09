@@ -29,7 +29,13 @@ module memory(address, data_in, data_out, write_enable, clk);
 	
 	// Initialize memory from an external hex file at the beginning of simulation
   initial begin
-      $readmemh("memory_data.hex", mem); // Load memory from a hex file
+      $readmemh("memory.hex", mem); // Load memory from a hex file
+          // Dump first 16 entries
+    $display("=== MEMORY CONTENTS ===");
+    for (int i = 0; i < 16; i++) begin
+        $display("mem[%0d] = %h", i, mem[i]);
+    end
+
   end
 
 endmodule
