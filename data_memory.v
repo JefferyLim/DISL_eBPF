@@ -20,7 +20,7 @@ module data_memory(stb, adr, we, ww, dat_w, clk, dat_r, data_ack);
 
 	//
 	reg [data_size-1:0] mem [0:memory_depth-1];
-	assign data_r = mem [adr];
+	assign dat_r = mem [adr];
 
 	always @(posedge clk) begin
 		case (we)
