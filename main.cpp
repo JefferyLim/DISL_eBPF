@@ -51,17 +51,18 @@ int main(int argc, char** argv, char** env) {
     top->reset_n = 0;
     top->clock = 0;
     top->csr_ctl = 0x0;
-
-            top->r1 = 0;
-            top->r2 = 5;
-            top->r3 = 6;
-            top->r4 = 7;
-            top->r5 = 0;
-            top->r6 = 0;
+            
+            
+    top->r1 = 23;
+    top->r2 = 2;
+    top->r3 = 6;
+    top->r4 = 7;
+    top->r5 = 0;
+    top->r6 = 0;
 
     // Simulate until $finish
     while (!contextp->gotFinish()){
-        if(contextp->time() > 400)
+        if(contextp->time() > 10900)
             break;
         // Historical note, before Verilator 4.200 Verilated::gotFinish()
         // was used above in place of contextp->gotFinish().
@@ -83,10 +84,9 @@ int main(int argc, char** argv, char** env) {
         // to where the controls are sampled; in this example we do
         // this only on a negedge of clk, because we know
         // reset is not sampled there.
-        if (!top->clock){ 
-            if (contextp->time() > 50 && contextp->time() < 100) {
+        if (top->clock){ 
+            if (contextp->time() >= 0 && contextp->time() < 100) {
                 top->reset_n = 0;  // Assert reset
-                                   //
                 top->csr_ctl = 0x0;
             } else {
                 top->reset_n = 1;  // Deassert reset
@@ -109,7 +109,10 @@ int main(int argc, char** argv, char** env) {
 
         // Read outputs
         VL_PRINTF("[%" PRId64 "] state: %x clk=%x rstl=%x csr_ctrl=%x csr_status=%x r0=%" PRIx64 " r1=%" PRIx64 " r2=%" PRIx64 " r3=%" PRIx64 " r4=%" PRIx64 " r5=%" PRIx64 " r6=%" PRIx64 " r7=%" PRIx64 " r8=%" PRIx64 " r9=%" PRIx64 " r10=%" PRIx64 " address=%" PRIx64 " instr=%" PRIx64 "\n",
-                  contextp->time(), top->cpu->state, top->clock, top->reset_n, top->csr_ctl, top->csr_status, top->r0, top->cpu->regs1, top->cpu->regs2, top->cpu->regs3, top->cpu->regs4, top->cpu->regs5, top->r6, top->r7, top->r8, top->r9, top->r10, top->cpu->ip_next, top->cpu->instruction);
+                  contextp->time(), top->cpu->state, top->clock, top->reset_n, top->csr_ctl, top->csr_status, top->r0, top->cpu->regs1, top->cpu->regs2, top->cpu->regs3, top->cpu->regs4, top->cpu->regs5, top->r6, top->r7, top->r8, top->r9, top->r10, top->cpu->ip, top->cpu->instruction);
+
+        if(top->cpu->instruction == 0x9500000000000000)
+            break;
 
     }
 

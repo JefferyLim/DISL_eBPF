@@ -316,8 +316,8 @@ reg [63:0] instruction /*verilator public*/;
 reg [7:0] keep_op;
 reg [3:0] keep_dst;
 
-reg [31:0] ip;
-reg [31:0] ip_next /*verilator public*/;
+reg [31:0] ip /*verilator public*/;
+reg [31:0] ip_next;
 
 
 // Continuous Assignment
@@ -369,6 +369,8 @@ reg [10:0] data_adr;
 wire [10:0] data_adr_wire = data_adr;
 reg data_we;
 wire data_we_wire = data_we;
+reg data_re;
+wire data_re_wire = data_re;
 reg [3:0] data_ww;
 wire [3:0] data_ww_wire = data_ww;
 reg [63:0] data_dat_w;
@@ -381,8 +383,25 @@ wire [15:0] data_dat_r2 = data_dat_r8[15:0];
 wire [31:0] data_dat_r4 = data_dat_r8[31:0];
 wire data_ack;
 
-data_memory #(.data_size(64), .address_size(11)) data_mem(.stb(data_stb_wire), .adr(data_adr_wire), .we(data_we_wire), .ww(data_ww_wire), .dat_w(data_dat_w_wire), .clk(clock), .dat_r(data_dat_r8), .data_ack(data_ack));
+//data_memory #(.data_size(64), .address_size(11)) data_mem(.stb(data_stb_wire), .adr(data_adr_wire), .we(data_we_wire), .ww(data_ww_wire), .dat_w(data_dat_w_wire), .clk(clock), .dat_r(data_dat_r8), .data_ack(data_ack));
 
+
+
+ram64_memory #(.DATA_SIZE(64), .ADDRESS_SIZE(11)) data_mem(
+    //.stb(data_stb_wire),
+    .wr_address(data_adr_wire),
+    .rd_address(data_adr_wire),
+    .data_in(data_dat_w_wire),
+    .data_out(data_dat_r8),
+    .write_enable(data_we_wire),
+    .read_enable(data_re_wire),
+    .write_word(data_ww_wire),
+    .ack(data_ack),
+    .clk(clock),
+    .rst(!reset_n_int)
+
+);
+    
 
 // -------64 Bit Logic and Arithmetic Shifter -------
 // input
@@ -483,7 +502,7 @@ always @(posedge clock or posedge reset_n) begin
 		regs[7] <= 0;
 		regs[8] <= 0;
 		regs[9] <= 0;
-		regs[10] <= 0;
+		regs[10] <= 64'h0;
 	end 
 
 	// If halt signal high, stop CPU
@@ -574,31 +593,41 @@ always @(posedge clock or posedge reset_n) begin
 
 					// OPC_LDX
 					OPC_LDX: begin
-						if (~cpu_data_ack) begin
+						
+                        $display("OPC_LDX: address : 0x%04x\n", regs[src] + offset); 
+                        if (~cpu_data_ack) begin
 							data_adr <= regs[src] + offset;
+                            data_re <= 1'b1;
 							state_next <= STATE_DATA_FETCH;
 						end
 						else begin
 
 							case (opcode)
-
 								// EBPF_OP_LDXB
 								EBPF_OP_LDXB: begin
+
+                                    $display("OPC_LDX: data : 0x%04x into %d \n", data_dat_r, dst); 
 									regs[dst] <= data_dat_r;
 								end // EBPF_OP_LDXB
 
 								// EBPF_OP_LDXH
 								EBPF_OP_LDXH: begin
+
+                                    $display("OPC_LDX: data : 0x%04x into %d \n", data_dat_r2, dst); 
 									regs[dst] <= data_dat_r2;
 								end // EBPF_OP_LDXH
 
 								// EBPF_OP_LDXW
 								EBPF_OP_LDXW: begin
+
+                                    $display("OPC_LDX: data : 0x%04x into %d \n", data_dat_r4, dst); 
 									regs[dst] <= data_dat_r4;
 								end // EBPF_OP_LDXW
 
 								// EBPF_OP_LDXDW
 								EBPF_OP_LDXDW: begin
+
+                                    $display("OPC_LDX: data : 0x%04x into %d \n", data_dat_r8, dst); 
 									regs[dst] <= data_dat_r8;
 								end // EBPF_OP_LDXDW
 
@@ -665,6 +694,7 @@ always @(posedge clock or posedge reset_n) begin
 
 					// OPC_STX
 					OPC_STX: begin
+                        $display("OPC_STX, opcode: 0x%04x. data 0x%04x addr 0x%04x\n", opcode, regs[src], regs[dst] + offset);
 						if (~cpu_data_ack) begin
 							data_adr <= regs[dst] + offset;
 							data_we <= 1;
@@ -961,13 +991,13 @@ always @(posedge clock or posedge reset_n) begin
 
 									// EBPF_OP_MOV_IMM
 									EBPF_OP_MOV_IMM: begin
-
-                                        $display("Register number: dst = %d, Immediate value: immediate = 0x%h", dst, immediate);
+                                        $display("EBPF_OP_MOV_IMM: dst = %d, Immediate value: immediate = 0x%h", dst, immediate);
 										regs[dst] <= immediate;
 									end // EBPF_OP_MOV_IMM
 
 									// EBPF_OP_MOV_REG
 									EBPF_OP_MOV_REG: begin
+                                        $display("EBPF_OP_MOV_REG: dst = %d, src = %d, Immediate value: immediate = 0x%h", dst, src, regs[src]);
 										regs[dst] <= regs[src];
 									end // EBPF_OP_MOV_REG
 
@@ -1045,6 +1075,7 @@ always @(posedge clock or posedge reset_n) begin
 
 					// OPC_JMP
 					OPC_JMP: begin
+                        $display("op jmp: 0x%04x\n", opcode);
 						case (opcode)
 
 							// EBPF_OP_CALL
@@ -1254,6 +1285,7 @@ always @(posedge clock or posedge reset_n) begin
 
 					// OPC_ALU64
 					OPC_ALU64: begin
+                        $display("OPC_ALU64: opcode: 0x%04x\n", opcode);
 						cpu_div64_ack <= 0;
 						case (opcode)
 						
@@ -1489,14 +1521,14 @@ always @(posedge clock or posedge reset_n) begin
 
 									// EBPF_OP_MOV64_IMM
 									EBPF_OP_MOV64_IMM: begin
-                                        $display("Register number: dst = %d, Immediate value: immediate = 0x%h", dst, immediate);
+                                        $display("EBPF_OP_MOV64_IMM: dst = %d, Immediate value: immediate = 0x%h", dst, immediate);
 										regs[dst] <= immediate;
 									end // EBPF_OP_MOV64_IMM
 
 									// EBPF_OP_MOV64_REG
 									EBPF_OP_MOV64_REG: begin
 
-                                        $display("Register number: dst = %d, Immediate value: immediate = 0x%h", dst, regs[src]);
+                                        $display("EBPF_OP_MOV64_REG: dst = %d, src = %d, Immediate value: immediate = 0x%h", dst, src, regs[src]);
 										regs[dst] <= regs[src];
 									end // EBPF_OP_MOV64_REG
 
@@ -1525,6 +1557,7 @@ always @(posedge clock or posedge reset_n) begin
 				if (data_ack) begin
 					data_stb <= 0;
 					data_we <= 0;
+					data_re <= 0;
 					state_next <= STATE_DECODE;
 					cpu_data_ack <= 1;
 				end
@@ -1567,6 +1600,7 @@ always @(posedge clock or posedge reset_n) begin
                         halt <= 1;
                     end
                     else begin
+                        $display("STATE_CALL_PENDING: 0x%04x\n", call_handler_ret);
                     	regs[0] <= call_handler_ret;
                     	state_next <= STATE_DECODE;
                     	ip_next <= ip_next + 1;
