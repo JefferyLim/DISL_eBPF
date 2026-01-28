@@ -1,0 +1,2 @@
+parcon @ git+https://github.com/rprinz08/parcon@24a8e532156ba362b08512518a376fbcbbfffe15
+six==1.17.0
