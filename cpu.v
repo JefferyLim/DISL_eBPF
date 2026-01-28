@@ -356,7 +356,7 @@ reg [11:0] pgm_addr /* verilator public*/;
 	wire [11:0] pgm_adr = ip_next[11:0];	// input
 wire [63:0] pgm_dat_r;			// output
 // read-only
-memory #(.data_size(64), .address_size(12)) pgm(.address(pgm_adr), .data_in(), .data_out(pgm_dat_r), .write_enable(1'b0), .clk(clock));
+memory #(.data_size(64), .address_size(12), .instruction(1)) pgm(.address(pgm_adr), .data_in(), .data_out(pgm_dat_r), .write_enable(1'b0), .clk(clock));
 
 
 // -------Data Memory (e.g Packet Data)------- (WIP)
@@ -384,8 +384,6 @@ wire [31:0] data_dat_r4 = data_dat_r8[31:0];
 wire data_ack;
 
 //data_memory #(.data_size(64), .address_size(11)) data_mem(.stb(data_stb_wire), .adr(data_adr_wire), .we(data_we_wire), .ww(data_ww_wire), .dat_w(data_dat_w_wire), .clk(clock), .dat_r(data_dat_r8), .data_ack(data_ack));
-
-
 
 ram64_memory #(.DATA_SIZE(64), .ADDRESS_SIZE(11)) data_mem(
     //.stb(data_stb_wire),

@@ -35,7 +35,21 @@ https://github.com/iovisor/bpf-docs/blob/master/eBPF.md
 https://github.com/emilmasoumi/ebpf-assembler
 
 
+## Installations
+
 You will need a python environment, so create one and install the necessary packages with `pip install -r requirements.txt`
+
+You will also need LLVM:
+
+```
+wget https://apt.llvm.org/llvm.sh
+chmod +x llvm.sh
+sudo ./llvm.sh 18
+
+sudo ln -s /usr/bin/clang-18 /usr/bin/clang
+sudo ln -s /usr/bin/llvm-objdump-18 /usr/bin/llvm-objdump
+sudo ln -s /usr/bin/llvm-objcopy-18 /usr/bin/llvm-objcopy
+```
 
 ## Assembler
 Write your assembly code and then copy the is\_prime\_make.sh example to compile assembly to a hex file
