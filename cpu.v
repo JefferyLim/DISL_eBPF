@@ -327,7 +327,7 @@ wire [2:0] opclass = opcode[2:0];
 
 // Byte 7
 wire [3:0] src = instruction[55:52];
-wire [3:0] dst = ((keep_dst == 0) ? (instruction[51:48]) : (keep_dst));
+wire [3:0] dst = ((keep_op == 0) ? (instruction[51:48]) : (keep_dst));
 
 // Byte 5-6
 wire [15:0] offset = {instruction[39:32], instruction[47:40]};
