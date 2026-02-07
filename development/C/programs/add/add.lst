@@ -1,0 +1,12 @@
+
+add.o:	file format elf64-bpf
+
+Disassembly of section .text:
+
+0000000000000000 <myfunc>:
+       0:	63 1a fc ff 00 00 00 00	*(u32 *)(r10 - 0x4) = r1
+       1:	63 2a f8 ff 00 00 00 00	*(u32 *)(r10 - 0x8) = r2
+       2:	61 a0 fc ff 00 00 00 00	r0 = *(u32 *)(r10 - 0x4)
+       3:	61 a1 f8 ff 00 00 00 00	r1 = *(u32 *)(r10 - 0x8)
+       4:	0f 10 00 00 00 00 00 00	r0 += r1
+       5:	95 00 00 00 00 00 00 00	exit
