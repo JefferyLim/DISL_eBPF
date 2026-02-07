@@ -53,7 +53,7 @@ int main(int argc, char** argv, char** env) {
     top->csr_ctl = 0x0;
             
             
-    top->r1 = 23;
+    top->r1 = 27;
     top->r2 = 2;
     top->r3 = 6;
     top->r4 = 7;
@@ -62,7 +62,7 @@ int main(int argc, char** argv, char** env) {
 
     // Simulate until $finish
     while (!contextp->gotFinish()){
-        if(contextp->time() > 10900)
+            if(contextp->time() > 2000)
             break;
         // Historical note, before Verilator 4.200 Verilated::gotFinish()
         // was used above in place of contextp->gotFinish().

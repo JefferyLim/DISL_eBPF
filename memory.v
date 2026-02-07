@@ -27,6 +27,7 @@ module memory(address, data_in, data_out, write_enable, clk);
     // +--------+----+----+----------------+------------------------+
     // 63     56   52   48               32                        0
 
+ integer i;
         // Initialize memory from an external hex file at the beginning of simulation
   initial begin
 
@@ -37,7 +38,7 @@ module memory(address, data_in, data_out, write_enable, clk);
 
     // Dump first 16 entries
     $display("=== MEMORY CONTENTS ===");
-    for (int i = 0; i < 16; i++) begin
+    for (i = 0; i < 16; i=i+1) begin
        $display("mem[%0d] = %h", i, mem[i]);
     end
 
