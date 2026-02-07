@@ -239,7 +239,7 @@ reg debug;
 // Control register for CPU
 // bits: 0-reset_n
 input [7:0] csr_ctl;
-wire reset_n_int = (reset_n | csr_ctl[0]);
+wire reset_n_int = (reset_n & csr_ctl[0]);
 
 // CPU Status register including all status flags
 // bits: 0-reset_n, 1-halt, 2-error, 7-debug
@@ -327,7 +327,7 @@ wire [2:0] opclass = opcode[2:0];
 
 // Byte 7
 wire [3:0] src = instruction[55:52];
-wire [3:0] dst = ((keep_dst == 0) ? (instruction[51:48]) : (keep_dst));
+wire [3:0] dst = ((keep_op == 0) ? (instruction[51:48]) : (keep_dst));
 
 // Byte 5-6
 wire [15:0] offset = {instruction[39:32], instruction[47:40]};
@@ -397,7 +397,6 @@ ram64_memory #(.DATA_SIZE(64), .ADDRESS_SIZE(11)) data_mem(
     .ack(data_ack),
     .clk(clock),
     .rst(!reset_n_int)
-
 );
     
 
@@ -480,8 +479,8 @@ always @(posedge clock or posedge reset_n) begin
 		ip <= 0;
 		instruction <= pgm_dat_r;
 
-		state <= STATE_OP_FETCH;
-		state_next <= STATE_OP_FETCH;
+		state <= STATE_DECODE;
+		state_next <= STATE_DECODE;
 
 		keep_op <= 0;
 		keep_dst <= 0;
@@ -501,6 +500,9 @@ always @(posedge clock or posedge reset_n) begin
 		regs[8] <= 0;
 		regs[9] <= 0;
 		regs[10] <= 64'h0;
+					
+		data_we <= 0;
+		data_re <= 0;
 	end 
 
 	// If halt signal high, stop CPU
@@ -1203,6 +1205,7 @@ always @(posedge clock or posedge reset_n) begin
 
 									// EBPF_OP_EXIT
 									EBPF_OP_EXIT: begin
+										$display("HI");										
 										halt <= 1;
 									end // EBPF_OP_EXIT
 
