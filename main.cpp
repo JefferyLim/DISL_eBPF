@@ -53,12 +53,12 @@ int main(int argc, char** argv, char** env) {
     top->csr_ctl = 0x0;
             
             
-    top->r1 = 27;
+    top->r1 = 1;
     top->r2 = 2;
-    top->r3 = 6;
-    top->r4 = 7;
-    top->r5 = 0;
-    top->r6 = 0;
+    top->r3 = 3;
+    top->r4 = 4;
+    top->r5 = 5;
+
 
     // Simulate until $finish
     while (!contextp->gotFinish()){

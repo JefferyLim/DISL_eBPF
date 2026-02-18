@@ -10,7 +10,7 @@ rm -rf "${F}.hex"
 
 clang \
 	-target bpf \
-	-Wall -O0 \
+	-Wall -O2 \
 	-c "${F}.c" \
 	-o "${F}.o"
 

@@ -1225,14 +1225,14 @@ always @(posedge clock or posedge reset_n) begin
 
 									// EBPF_OP_JLE_IMM
 									EBPF_OP_JLE_IMM: begin
-										if (regs[dst] < immediate) begin
+										if (regs[dst] <= immediate) begin
 											ip_next <= (ip_next + offset_s);
 										end
 									end // EBPF_OP_JLE_IMM
 
 									// EBPF_OP_JLE_REG
 									EBPF_OP_JLE_REG: begin
-										if (regs[dst] < regs[src]) begin
+										if (regs[dst] <= regs[src]) begin
 											ip_next <= (ip_next + offset_s);
 										end
 									end // EBPF_OP_JLE_REG

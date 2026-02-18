@@ -4,9 +4,9 @@
 void bubble_sort(int arr[], int n);
 bool is_sorted(int arr[], int n);
 
-bool sort (){
+bool sort (int a1, int a2, int a3, int a4, int a5){
     int n = 5;
-    int arr[5] = {5, 4, 3, 2, 1};
+    int arr[5] = {a1, a2, a3, a4, a5};
 
 
     for (int i = 0; i < n - 1; i++) {
