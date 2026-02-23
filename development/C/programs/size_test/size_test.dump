@@ -1,0 +1,8 @@
+
+size_test.o:	file format elf64-bpf
+
+Disassembly of section .text:
+
+0000000000000000 <size_test>:
+       0:	18 00 00 00 0f 14 14 18 00 00 00 00 10 12 14 16	r0 = 0x161412101814140f ll
+       2:	95 00 00 00 00 00 00 00	exit
